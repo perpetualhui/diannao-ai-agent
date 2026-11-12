@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>店脑 · 选择你的场景</title>
+<style>
+  :root{--brand:#2c6660;--brand-dark:#1d383d;--ink:#1f2d2b;--muted:#7a8a86;--paper:#fbfcf9;--line:#dfe8e1}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;color:var(--ink);
+    background:radial-gradient(1100px 560px at 12% -8%,#dcebe1 0%,transparent 60%),
+               radial-gradient(900px 500px at 92% 108%,#e9e4d7 0%,transparent 55%),#eaf0ea;
+    padding:56px 24px 72px}
+  .wrap{max-width:1080px;margin:0 auto}
+  .brand{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+  .brand h1{font-size:34px;margin:0;letter-spacing:-.06em;font-weight:900;color:#193c42}
+  .brand h1 span{color:#d18354}
+  .brand small{font-size:13px;color:var(--muted)}
+  .lede{font-size:16px;line-height:1.85;color:#4c625d;margin:0 0 38px;max-width:760px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+  .scene{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:30px 28px;
+    box-shadow:0 16px 40px rgba(30,70,55,.07);display:flex;flex-direction:column;gap:14px;
+    transition:.2s;text-decoration:none;color:inherit;position:relative;overflow:hidden}
+  .scene:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(30,70,55,.14);border-color:#bcd5c4}
+  .scene .ico{font-size:34px;line-height:1}
+  .scene h2{font-size:21px;margin:0;letter-spacing:-.02em}
+  .scene .sub{font-size:12px;color:#9d6749;font-weight:700;letter-spacing:.12em}
+  .scene p{margin:0;font-size:13.5px;line-height:1.8;color:#5d736d}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px}
+  .tags span{background:#edf4ee;color:#4f6b60;border-radius:6px;font-size:11px;padding:5px 8px}
+  .go{margin-top:auto;padding-top:16px;display:flex;align-items:center;justify-content:space-between}
+  .go b{color:var(--brand);font-size:13px}
+  .go .arrow{color:var(--brand);font-size:18px}
+  .scene::after{content:"";position:absolute;inset:auto -30% -60% auto;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,#2c66600f,transparent 70%)}
+  .footer{margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:13px;color:#6b7f79}
+  .footer a{color:var(--brand);text-decoration:none;font-weight:700}
+  .footer .dot{width:4px;height:4px;border-radius:50%;background:#b7c6bf}
+  .notice{margin-top:26px;font-size:12px;color:#8a9a95;line-height:1.8}
+  @media(max-width:640px){body{padding:32px 16px 48px}.brand h1{font-size:27px}.lede{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><h1>店脑<span>·</span></h1><small>门店经验与老客服务系统</small></div>
+  <p class="lede">
+    老店姐回老家了，三百多个老客的喜好还在店里。<br>
+    选一个场景，看看店脑怎么在微信里帮店员接住每一位老客。
+  </p>
+
+  <div class="grid">
+    <a class="scene" href="/wechat-demo.html?scene=baby">
+      <div class="ico">🍼</div>
+      <div class="sub">SCENE 01 · 母婴店</div>
+      <h2>店铺经验传承机器人</h2>
+      <p>店姐离职后，新店员靠尾号就能查到：上次买的哪款、孩子多大、有没有过敏。经验不再跟着人走。</p>
+      <div class="tags"><span>老客交接</span><span>过敏阻断</span><span>补货提醒</span><span>带证据回答</span></div>
+      <div class="go"><b>进入演示</b><span class="arrow">→</span></div>
+    </a>
+
+    <a class="scene" href="/wechat-demo.html?scene=apparel">
+      <div class="ico">👕</div>
+      <div class="sub">SCENE 02 · 服装店</div>
+      <h2>店铺管理与客户画像师</h2>
+      <p>会员一报手机号，尺码、版型、颜色偏好全在。推荐不靠猜，库存不承诺，搭配有依据。</p>
+      <div class="tags"><span>尺码画像</span><span>搭配建议</span><span>偏好沉淀</span><span>库存需确认</span></div>
+      <div class="go"><b>进入演示</b><span class="arrow">→</span></div>
+    </a>
+
+    <a class="scene" href="/wechat-demo.html?scene=fraud">
+      <div class="ico">🛡️</div>
+      <div class="sub">SCENE 03 · AI 反诈</div>
+      <h2>诈骗检测与提醒</h2>
+      <p>客人问「刷单返利是真的吗」，店脑只给风险信号、官方来源与核实步骤，不认定犯罪，不碰门店数据。</p>
+      <div class="tags"><span>官方来源</span><span>风险信号</span><span>96110 指引</span><span>零数据连通</span></div>
+      <div class="go"><b>进入演示</b><span class="arrow">→</span></div>
+    </a>
+  </div>
+
+  <div class="footer">
+    <a href="/landing.html">产品介绍</a><span class="dot"></span>
+    <a href="/setup.html">＋ 配置我的店</a><span class="dot"></span>
+    <a href="/">进入管理后台</a><span class="dot"></span>
+    <span>扫码绑定微信，配置即生效</span>
+  </div>
+  <p class="notice">
+    演示数据均为模拟，不对应真实客户；反诈案例为公开官方来源整理，正式上线前需逐条审核。
+  </p>
+</div>
+</body>
+</html>

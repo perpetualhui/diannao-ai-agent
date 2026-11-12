@@ -1,0 +1,43 @@
+{
+  "schema_version": "2.1",
+  "scene_id": "baby",
+  "label": "母婴（首发 P0）",
+  "owner": "张（D）维护 · 周（A）复核业务口径",
+  "version": 1,
+  "updated_at": "2026-11-07",
+  "subject_types": ["person", "child", "family"],
+  "field_schema": {
+    "child.birthdate": { "type": "date", "derived": ["age_months"], "data_class": "objective", "note": "有明确出生日期才计算月龄，无日期输出『月龄未知』，不编造" },
+    "child.allergy": { "type": "array", "data_class": "safety", "manual_verification": true, "note": "唯一权威来源是 status=verified 的人工核实记录；AI 不得从聊天推断" },
+    "child.formula_stage": { "type": "string", "data_class": "objective" },
+    "child.diapers_size": { "type": "string", "data_class": "preference" },
+    "pref.brand": { "type": "string", "data_class": "preference" }
+  },
+  "intent_rules": [
+    { "pattern": "买过{商品}吗", "handler": "askPurchase", "evidence_required": "transaction" },
+    { "pattern": "能(喝|用|吃){成分}吗", "handler": "askSafety", "evidence_required": "verified_attribute", "always_handoff": true },
+    { "pattern": "和上次一样", "handler": "buildCustomerCard", "evidence_required": "transaction", "note": "只锚定具体 SKU，绝不当成自动订单" }
+  ],
+  "safety_policy": {
+    "allergy_match": "block_and_handoff",
+    "no_record": "still_handoff",
+    "note": "有过敏记录→阻断+转人工；无记录→仍转人工（记录可能过时）。AI 永远不做适用性结论。"
+  },
+  "identity_policy": {
+    "ambiguous": "masked_candidates_only",
+    "note": "尾号/姓名命中多人只回脱敏候选，未确认前不展示档案"
+  },
+  "hard_rules": [
+    "allergy_manual_check",
+    "no_fabrication_on_no_data",
+    "evidence_on_every_fact",
+    "never_auto_order"
+  ],
+  "human_handoff": ["medical_advice", "child_health", "complaint", "safety_conflict", "allergy_related_choice"],
+  "acceptance_tests_ref": "../../eval/evalset.json",
+  "sample_queries": [
+    "手机号尾号1234的张女士上次买了什么纸尿裤？",
+    "张姐说和上次一样，再拿一箱",
+    "这个宝宝能喝含牛奶蛋白的奶粉吗？"
+  ]
+}

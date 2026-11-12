@@ -1,0 +1,10 @@
+{
+  "id": "dian-nao-tool",
+  "name": "DianNao AI Readonly Tool",
+  "description": "Restricted store memory lookup plugin for a single verified staff account (internal demo)",
+  "categories": ["other"],
+  "contracts": { "tools": ["dian_nao_ask"] },
+  "toolMetadata": { "dian_nao_ask": { "optional": true } },
+  "activation": { "onStartup": true },
+  "configSchema": { "type": "object", "additionalProperties": false }
+}

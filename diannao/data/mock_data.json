@@ -1,0 +1,163 @@
+{
+  "__说明": "冲刺用模拟数据。全部为虚构，不对应任何真实客户。标注 __mock=true 的数据不得用于正式演示或对外。",
+  "__mock": true,
+  "__生成人": "周（A）",
+  "__生成日期": "2026-11-07",
+  "__统计": {
+    "客户数": 20,
+    "SKU数": 10,
+    "购买记录数": 30,
+    "测试账号数": 2
+  },
+
+  "tenants": [
+    { "id": "t-001", "name": "贝贝母婴店（试点）", "industry_code": "baby" },
+    { "id": "t-002", "name": "邻家母婴店（隔离测试用）", "industry_code": "baby" }
+  ],
+
+  "stores": [
+    { "id": "s-001", "tenant_id": "t-001", "name": "贝贝母婴店·总店" },
+    { "id": "s-002", "tenant_id": "t-002", "name": "邻家母婴店" }
+  ],
+
+  "app_users": [
+    { "id": "u-001", "login_name": "zhou", "display_name": "周店长", "disabled_at": null },
+    { "id": "u-002", "login_name": "luo", "display_name": "罗店员", "disabled_at": null },
+    { "id": "u-003", "login_name": "qiu_old", "display_name": "邱（已离职）", "disabled_at": "2026-10-15" }
+  ],
+
+  "memberships": [
+    { "id": "m-001", "tenant_id": "t-001", "store_id": "s-001", "user_id": "u-001", "role": "owner", "revoked_at": null },
+    { "id": "m-002", "tenant_id": "t-001", "store_id": "s-001", "user_id": "u-002", "role": "staff", "revoked_at": null },
+    { "id": "m-003", "tenant_id": "t-001", "store_id": "s-001", "user_id": "u-003", "role": "staff", "revoked_at": "2026-10-15" }
+  ],
+
+  "test_accounts": [
+    {
+      "login_name": "zhou",
+      "token": "test-token-zhou-owner-t001",
+      "binds_tenant": "t-001",
+      "binds_store": "s-001",
+      "role": "owner",
+      "display_name": "周店长（店主账号）"
+    },
+    {
+      "login_name": "luo",
+      "token": "test-token-luo-staff-t001",
+      "binds_tenant": "t-001",
+      "binds_store": "s-001",
+      "role": "staff",
+      "display_name": "罗店员（店员账号）"
+    }
+  ],
+  "__test_accounts说明": "冲刺版简化 token。服务端解析 token 得 tenant_id/role，不接受前端传入。u-003 已离职，无 token，任何请求应被拒。",
+
+  "products": [
+    { "id": "p-001", "tenant_id": "t-001", "sku": "NP-L2-90", "name": "安贝婴儿纸尿裤 L码 90片", "category": "纸尿裤", "current_price": 129.00, "shelf_location": "A1-03", "attributes": { "size": "L", "stage": "学步期" } },
+    { "id": "p-002", "tenant_id": "t-001", "sku": "NP-M2-72", "name": "安贝婴儿纸尿裤 M码 72片", "category": "纸尿裤", "current_price": 119.00, "shelf_location": "A1-04", "attributes": { "size": "M", "stage": "翻身期" } },
+    { "id": "p-003", "tenant_id": "t-001", "sku": "FM-1-800", "name": "诺贝婴儿配方奶粉 1段 800g", "category": "奶粉", "current_price": 268.00, "shelf_location": "B2-01", "attributes": { "stage": "1段", "age_range": "0-6月" } },
+    { "id": "p-004", "tenant_id": "t-001", "sku": "FM-2-800", "name": "诺贝婴儿配方奶粉 2段 800g", "category": "奶粉", "current_price": 278.00, "shelf_location": "B2-02", "attributes": { "stage": "2段", "age_range": "6-12月" } },
+    { "id": "p-005", "tenant_id": "t-001", "sku": "FM-3-800", "name": "诺贝幼儿配方奶粉 3段 800g", "category": "奶粉", "current_price": 288.00, "shelf_location": "B2-03", "attributes": { "stage": "3段", "age_range": "12-36月" } },
+    { "id": "p-006", "tenant_id": "t-001", "sku": "FM-2-SPECIAL-800", "name": "诺贝特殊配方奶粉 2段（深度水解）800g", "category": "奶粉", "current_price": 398.00, "shelf_location": "B2-04", "attributes": { "stage": "2段", "special": "深度水解", "note": "牛奶蛋白过敏宝宝适用" } },
+    { "id": "p-007", "tenant_id": "t-001", "sku": "WB-20", "name": "柔润婴儿湿巾 80抽", "category": "日用品", "current_price": 19.90, "shelf_location": "C3-01", "attributes": {} },
+    { "id": "p-008", "tenant_id": "t-001", "sku": "PB-L", "name": "贝乐婴儿洗护二合一 300ml", "category": "洗护", "current_price": 49.00, "shelf_location": "C3-05", "attributes": {} },
+    { "id": "p-009", "tenant_id": "t-001", "sku": "PB-CAL", "name": "拜奥益生菌滴剂 5ml", "category": "营养品", "current_price": 298.00, "shelf_location": "D4-02", "attributes": { "note": "需向家长确认月龄" } },
+    { "id": "p-010", "tenant_id": "t-001", "sku": "TOY-TEETH", "name": "安贝牙胶玩具", "category": "玩具", "current_price": 39.00, "shelf_location": "E5-01", "attributes": {} }
+  ],
+
+  "subjects": [
+    { "id": "c-001", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "张丽", "profile": { "member_no": "M10012" } },
+    { "id": "c-002", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "张丽华", "profile": { "member_no": "M10039" } },
+    { "id": "c-003", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "王芳", "profile": { "member_no": "M10003" } },
+    { "id": "c-004", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "李娜", "profile": { "member_no": "M10005" } },
+    { "id": "c-005", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "陈静", "profile": { "member_no": "M10007" } },
+    { "id": "c-006", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "刘洋", "profile": { "member_no": "M10009" } },
+    { "id": "c-007", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "赵敏", "profile": { "member_no": "M10011" } },
+    { "id": "c-008", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "孙丽", "profile": { "member_no": "M10015" } },
+    { "id": "c-009", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "周婷", "profile": { "member_no": "M10018" } },
+    { "id": "c-010", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "吴倩", "profile": { "member_no": "M10021" } },
+    { "id": "c-011", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "郑洁", "profile": { "member_no": "M10024" } },
+    { "id": "c-012", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "王磊", "profile": { "member_no": "M10027" } },
+    { "id": "c-013", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "张伟", "profile": { "member_no": "M10030" } },
+    { "id": "c-014", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "李强", "profile": { "member_no": "M10033" } },
+    { "id": "c-015", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "陈晨", "profile": { "member_no": "M10036" } },
+    { "id": "c-016", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "杨柳", "profile": { "member_no": "M10042" } },
+    { "id": "c-017", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "何梅", "profile": { "member_no": "M10045" } },
+    { "id": "c-018", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "高媛", "profile": { "member_no": "M10048" } },
+    { "id": "c-019", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "林红", "profile": { "member_no": "M10051" } },
+    { "id": "c-020", "tenant_id": "t-001", "store_id": "s-001", "subject_type": "person", "display_name": "罗玲", "profile": { "member_no": "M10054" } }
+  ],
+
+  "subject_relations": [
+    { "id": "r-001", "tenant_id": "t-001", "from_subject": "c-001", "to_subject": "k-001", "relation_type": "parent_of" },
+    { "id": "r-002", "tenant_id": "t-001", "from_subject": "c-001", "to_subject": "k-002", "relation_type": "parent_of" },
+    { "id": "r-003", "tenant_id": "t-001", "from_subject": "c-002", "to_subject": "k-003", "relation_type": "parent_of" },
+    { "id": "r-004", "tenant_id": "t-001", "from_subject": "c-003", "to_subject": "k-004", "relation_type": "parent_of" },
+    { "id": "r-005", "tenant_id": "t-001", "from_subject": "c-004", "to_subject": "k-005", "relation_type": "parent_of" }
+  ],
+
+  "children": [
+    { "id": "k-001", "tenant_id": "t-001", "subject_type": "child", "display_name": "小宝", "profile": { "birthdate": "2025-08-01", "formula_stage": "2段", "diapers_size": "L" } },
+    { "id": "k-002", "tenant_id": "t-001", "subject_type": "child", "display_name": "二宝", "profile": { "birthdate": "2024-03-15", "formula_stage": "3段", "diapers_size": "L" } },
+    { "id": "k-003", "tenant_id": "t-001", "subject_type": "child", "display_name": "安安", "profile": { "birthdate": "2025-09-10", "formula_stage": "2段", "diapers_size": "M" } },
+    { "id": "k-004", "tenant_id": "t-001", "subject_type": "child", "display_name": "果果", "profile": { "birthdate": "2025-11-20", "formula_stage": "1段", "diapers_size": "S" } },
+    { "id": "k-005", "tenant_id": "t-001", "subject_type": "child", "display_name": "糖糖", "profile": { "birthdate": "2025-06-05", "formula_stage": "2段", "diapers_size": "M" } }
+  ],
+
+  "identity_keys": [
+    { "tenant_id": "t-001", "subject_id": "c-001", "key_type": "phone_last4", "key_hash": "hash_1234", "masked_label": "张丽 · 尾号 **12" },
+    { "tenant_id": "t-001", "subject_id": "c-002", "key_type": "phone_last4", "key_hash": "hash_1234", "masked_label": "张丽华 · 尾号 **39" },
+    { "tenant_id": "t-001", "subject_id": "c-003", "key_type": "phone_last4", "key_hash": "hash_5678", "masked_label": "王芳 · 尾号 **78" },
+    { "tenant_id": "t-001", "subject_id": "c-004", "key_type": "phone_last4", "key_hash": "hash_2468", "masked_label": "李娜 · 尾号 **68" },
+    { "tenant_id": "t-001", "subject_id": "c-005", "key_type": "phone_last4", "key_hash": "hash_1357", "masked_label": "陈静 · 尾号 **57" },
+    { "tenant_id": "t-001", "subject_id": "c-001", "key_type": "member_no", "key_hash": "hash_M10012", "masked_label": "会员号 M10012" },
+    { "tenant_id": "t-001", "subject_id": "c-002", "key_type": "member_no", "key_hash": "hash_M10039", "masked_label": "会员号 M10039" }
+  ],
+  "__identity_keys说明": "c-001 和 c-002 共享尾号 1234，用于测试 Q1 歧义分支。",
+
+  "attributes": [
+    { "id": "a-001", "tenant_id": "t-001", "subject_id": "k-001", "attr_key": "allergy", "value": ["牛奶蛋白"], "data_class": "safety", "source_type": "verified_attribute", "source_id": "manual-2025-09", "observed_at": "2025-09-05", "verified_by": "u-001", "status": "verified" },
+    { "id": "a-002", "tenant_id": "t-001", "subject_id": "k-001", "attr_key": "pref.brand", "value": "诺贝", "data_class": "preference", "source_type": "transaction", "source_id": "txn-001", "observed_at": "2026-10-20", "status": "draft" },
+    { "id": "a-003", "tenant_id": "t-001", "subject_id": "k-003", "attr_key": "allergy", "value": [], "data_class": "safety", "source_type": "verified_attribute", "source_id": "manual-check", "observed_at": "2025-10-01", "verified_by": "u-001", "status": "verified" }
+  ],
+  "__attributes说明": "k-001（小宝）有牛奶蛋白过敏，用于测试 Q4 安全字段阻断。k-003 无过敏记录。",
+
+  "transactions": [
+    { "id": "txn-001", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-001", "occurred_at": "2026-10-20T10:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-006", "quantity": 2, "unit_price": 398.00 } ] },
+    { "id": "txn-002", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-001", "occurred_at": "2026-09-18T14:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-006", "quantity": 2, "unit_price": 398.00 }, { "product_id": "p-001", "quantity": 1, "unit_price": 129.00 } ] },
+    { "id": "txn-003", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-002", "occurred_at": "2026-10-25T11:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-004", "quantity": 3, "unit_price": 278.00 } ] },
+    { "id": "txn-004", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-003", "occurred_at": "2026-10-28T09:15:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-003", "quantity": 2, "unit_price": 268.00 } ] },
+    { "id": "txn-005", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-003", "occurred_at": "2026-09-30T16:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-007", "quantity": 3, "unit_price": 19.90 } ] },
+    { "id": "txn-006", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-004", "occurred_at": "2026-10-22T13:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-005", "quantity": 2, "unit_price": 288.00 } ] },
+    { "id": "txn-007", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-005", "occurred_at": "2026-10-15T10:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-001", "quantity": 2, "unit_price": 129.00 } ] },
+    { "id": "txn-008", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-005", "occurred_at": "2026-09-10T11:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-008", "quantity": 1, "unit_price": 49.00 } ] },
+    { "id": "txn-009", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-006", "occurred_at": "2026-10-12T15:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-004", "quantity": 1, "unit_price": 278.00 } ] },
+    { "id": "txn-010", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-007", "occurred_at": "2026-10-08T14:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-009", "quantity": 1, "unit_price": 298.00 } ] },
+    { "id": "txn-011", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-008", "occurred_at": "2026-10-05T10:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-002", "quantity": 2, "unit_price": 119.00 } ] },
+    { "id": "txn-012", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-009", "occurred_at": "2026-10-03T09:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-010", "quantity": 1, "unit_price": 39.00 } ] },
+    { "id": "txn-013", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-010", "occurred_at": "2026-09-28T16:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-003", "quantity": 3, "unit_price": 268.00 } ] },
+    { "id": "txn-014", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-011", "occurred_at": "2026-09-25T11:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-004", "quantity": 2, "unit_price": 278.00 } ] },
+    { "id": "txn-015", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-012", "occurred_at": "2026-09-20T13:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-007", "quantity": 5, "unit_price": 19.90 } ] },
+    { "id": "txn-016", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-013", "occurred_at": "2026-09-18T10:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-001", "quantity": 1, "unit_price": 129.00 } ] },
+    { "id": "txn-017", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-014", "occurred_at": "2026-09-15T14:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-005", "quantity": 1, "unit_price": 288.00 } ] },
+    { "id": "txn-018", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-015", "occurred_at": "2026-09-12T11:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-008", "quantity": 2, "unit_price": 49.00 } ] },
+    { "id": "txn-019", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-016", "occurred_at": "2026-09-08T09:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-004", "quantity": 2, "unit_price": 278.00 } ] },
+    { "id": "txn-020", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-017", "occurred_at": "2026-09-05T15:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-003", "quantity": 1, "unit_price": 268.00 } ] },
+    { "id": "txn-021", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-018", "occurred_at": "2026-09-02T10:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-010", "quantity": 2, "unit_price": 39.00 } ] },
+    { "id": "txn-022", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-019", "occurred_at": "2026-08-30T13:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-009", "quantity": 1, "unit_price": 298.00 } ] },
+    { "id": "txn-023", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-020", "occurred_at": "2026-08-28T11:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-002", "quantity": 3, "unit_price": 119.00 } ] },
+    { "id": "txn-024", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-001", "occurred_at": "2026-08-20T10:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-006", "quantity": 1, "unit_price": 398.00 } ] },
+    { "id": "txn-025", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-003", "occurred_at": "2026-08-15T14:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-003", "quantity": 2, "unit_price": 268.00 } ] },
+    { "id": "txn-026", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-004", "occurred_at": "2026-08-10T09:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-005", "quantity": 1, "unit_price": 288.00 } ] },
+    { "id": "txn-027", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-005", "occurred_at": "2026-08-05T16:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-001", "quantity": 1, "unit_price": 129.00 } ] },
+    { "id": "txn-028", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-006", "occurred_at": "2026-07-30T11:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-004", "quantity": 2, "unit_price": 278.00 } ] },
+    { "id": "txn-029", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-007", "occurred_at": "2026-07-25T10:00:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-009", "quantity": 1, "unit_price": 298.00 } ] },
+    { "id": "txn-030", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-008", "occurred_at": "2026-07-20T13:30:00Z", "source_type": "pos", "status": "confirmed", "lines": [ { "product_id": "p-002", "quantity": 1, "unit_price": 119.00 } ] }
+  ],
+  "__transactions说明": "30 条记录。c-001（张丽）有 3 条，全买特殊配方奶粉 p-006（牛奶蛋白过敏宝宝适用）。c-003（王芳）买过奶粉和湿巾，但没买过益生菌（测试 Q3 无记录）。",
+
+  "service_events": [
+    { "id": "se-001", "tenant_id": "t-001", "store_id": "s-001", "subject_id": "c-001", "service_type": "consultation", "details": { "note": "宝宝转奶咨询，确认牛奶蛋白过敏，推荐深度水解配方", "handled_by": "u-003" }, "occurred_at": "2025-09-05T10:00:00Z", "source_type": "staff_note" }
+  ],
+  "__service_events说明": "se-001 由已离职店员 u-003（邱）记录，测试 Q5：数据归门店，离职店员旧记录仍在但本人已无权。"
+}

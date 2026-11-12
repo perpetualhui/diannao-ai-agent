@@ -1,0 +1,38 @@
+# 依赖与构建产物
+node_modules/
+dist/
+.pnpm-store/
+*.tsbuildinfo
+
+# 环境与凭据（绝不入库）
+.env
+.env.*
+!.env.example
+data/provision.key
+data/*.db
+data/*.db-shm
+data/*.db-wal
+adapters/wechat/users.json
+!adapters/wechat/users.example.json
+*wechat-login-qr*.png
+server-wx-qr.png
+
+# 运行与测试产物
+*.log
+test-results/
+playwright-report/
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+
+# 协作临时区
+_snapshots/
+_incoming/
+_outbox/
+_backup/
+.tmp-plugin/
+*.zip
+
+# 系统
+.DS_Store
+Thumbs.db
+desktop.ini

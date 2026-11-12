@@ -1,0 +1,327 @@
+openapi: 3.0.3
+info:
+  title: 店脑 AI 业务 API（拟实现，非微信/腾讯官方接口）
+  version: 2.0.0-draft
+  description: |
+    此规格约定店脑后台和专用 OpenClaw Agent 的受控业务边界。
+    Authorization bearer 凭证必须在服务端绑定真实角色、tenant_id 和 store_id；
+    任何请求体中的角色/租户声明都不能成为权限依据。
+servers:
+  - url: https://api.example.invalid
+    description: 示例占位域名（部署后替换）
+security:
+  - StaffBearer: []
+tags:
+  - name: PrivateAssistant
+  - name: Identity
+  - name: Notes
+  - name: Recommendation
+  - name: Reminders
+  - name: Reports
+  - name: Imports
+  - name: PublicAntifraud
+paths:
+  /v1/assistant/ask:
+    post:
+      tags: [PrivateAssistant]
+      summary: 查询本商家授权范围内的历史事实、知识和经验
+      operationId: askStore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskRequest'
+      responses:
+        '200':
+          description: 问答或需要补充身份线索
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssistantResponse' }
+        '401': { description: 未认证 }
+        '403': { description: 无授权访问商家数据 }
+        '429': { description: 请求限流 }
+  /v1/identity/resolve:
+    post:
+      tags: [Identity]
+      summary: 仅返回当前门店的脱敏匹配候选
+      operationId: resolveIdentity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query: { type: string, maxLength: 200 }
+                subject_type: { type: string, enum: [person, child, vehicle, family] }
+      responses:
+        '200':
+          description: 候选列表（脱敏，无完整档案）
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [candidates, needs_confirmation]
+                properties:
+                  candidates:
+                    type: array
+                    items: { $ref: '#/components/schemas/MaskedCandidate' }
+                  needs_confirmation: { type: boolean }
+                  trace_id: { type: string }
+        '403': { description: 拒绝跨租户/门店查询 }
+  /v1/notes/drafts:
+    post:
+      tags: [Notes]
+      summary: 新建轻量采集草稿，不直接覆盖客观/安全字段
+      operationId: createDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subject_ref, content]
+              properties:
+                subject_ref: { type: string, description: 已经消歧确认、授权返回的主体引用 }
+                content: { type: string, maxLength: 4000 }
+                source_type: { type: string, enum: [staff_text, voice_transcript, image_extract, imported] }
+      responses:
+        '201':
+          description: 草稿已创建，待审核
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MutationReceipt' }
+        '403': { description: 无权编辑该记录 }
+  /v1/notes/{id}/approve:
+    post:
+      tags: [Notes]
+      summary: 审核经验或记录草稿（店长/管理员）
+      operationId: approveDraft
+      parameters: [{ in: path, name: id, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision, expected_version]
+              properties:
+                decision: { type: string, enum: [approve, reject] }
+                expected_version: { type: integer, minimum: 1 }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: 已审核
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MutationReceipt' }
+        '403': { description: 无审批权限 }
+        '409': { description: 版本冲突 }
+  /v1/recommendations:
+    post:
+      tags: [Recommendation]
+      summary: 生成符合硬规则与禁忌的推荐（不是自动销售或收款）
+      operationId: recommendProducts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subject_ref, intent]
+              properties:
+                subject_ref: { type: string }
+                intent: { type: string, maxLength: 500 }
+                max_results: { type: integer, minimum: 1, maximum: 5, default: 3 }
+      responses:
+        '200':
+          description: 合规候选 + 基于证据的理由；可返回人工核实
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssistantResponse' }
+  /v1/reminders:
+    get:
+      tags: [Reminders]
+      summary: 查询当前授权范围内的提醒，不执行发送
+      operationId: listReminders
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [draft, pending_approval, approved, queued, sent, failed, expired] }
+      responses:
+        '200':
+          description: 已授权提醒
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Reminder' }
+  /v1/reminders/{id}/approve:
+    post:
+      tags: [Reminders]
+      summary: 审批提醒草稿；不代表送达
+      operationId: approveReminder
+      parameters: [{ in: path, name: id, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200':
+          description: 提醒可进入队列
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MutationReceipt' }
+        '403': { description: 无审批权或客户未同意触达 }
+  /v1/reports/overview:
+    get:
+      tags: [Reports]
+      summary: 经营分析摘要（按授权门店）
+      operationId: getOverview
+      parameters:
+        - in: query
+          name: from
+          required: true
+          schema: { type: string, format: date }
+        - in: query
+          name: to
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 从业务流水聚合的营业额、订单量和复购指标
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period: { type: string }
+                  currency: { type: string, example: CNY }
+                  gross_sales: { type: number }
+                  order_count: { type: integer }
+                  repeat_buyer_count: { type: integer }
+                  source_updated_at: { type: string, format: date-time }
+  /v1/imports/preview:
+    post:
+      tags: [Imports]
+      summary: 导入预览和字段映射（需要管理权限）
+      operationId: previewImport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file_ref, mapping]
+              properties:
+                file_ref: { type: string }
+                mapping:
+                  type: object
+                  additionalProperties: { type: string }
+      responses:
+        '200':
+          description: 列出缺失字段、疑似重复、可导入条数
+        '403': { description: 无权导入 }
+  /v1/antifraud/assess:
+    post:
+      tags: [PublicAntifraud]
+      summary: 匿名反诈辅助识别（只访问审核过的公共来源）
+      security: [{ PublicAntifraudBearer: [] }]
+      operationId: assessFraud
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [description]
+              properties:
+                description: { type: string, minLength: 2, maxLength: 4000 }
+      responses:
+        '200':
+          description: 风险信号、相似案例与下一步建议（非刑事认定）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  risk_level: { type: string, enum: [unknown, low, medium, high] }
+                  matched_signals: { type: array, items: { type: string } }
+                  cases: { type: array, items: { $ref: '#/components/schemas/FraudCaseReference' } }
+                  uncertain_facts: { type: array, items: { type: string } }
+                  suggested_steps: { type: array, items: { type: string } }
+                  trace_id: { type: string }
+components:
+  securitySchemes:
+    StaffBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: Restricted-Service-Token
+      description: 映射到经确认的店员和租户。不能将请求体中的 role/tenant 视为凭据。
+    PublicAntifraudBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: Public-Scope-Token
+      description: 仅有反诈已审核案例读取权限，与私有商家凭证分离。
+  schemas:
+    AskRequest:
+      type: object
+      required: [question]
+      additionalProperties: false
+      properties:
+        question: { type: string, minLength: 1, maxLength: 1000 }
+        conversation_ref: { type: string, maxLength: 255, description: 仅做幂等/关联，不作为授权证明 }
+    Evidence:
+      type: object
+      required: [source_type, record_id, observed_at]
+      properties:
+        source_type: { type: string, enum: [transaction, service_event, verified_attribute, product, inventory_snapshot, knowledge_entry, rule] }
+        record_id: { type: string }
+        observed_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        excerpt: { type: string, maxLength: 200 }
+    MaskedCandidate:
+      type: object
+      required: [subject_ref, masked_label]
+      properties:
+        subject_ref: { type: string }
+        masked_label: { type: string }
+    AssistantResponse:
+      type: object
+      required: [status, answer, evidence, needs_confirmation, handoff, trace_id]
+      properties:
+        status: { type: string, enum: [ok, no_data, needs_confirmation, needs_human, forbidden, error] }
+        answer: { type: string }
+        evidence: { type: array, items: { $ref: '#/components/schemas/Evidence' } }
+        candidates: { type: array, items: { $ref: '#/components/schemas/MaskedCandidate' } }
+        needs_confirmation: { type: boolean }
+        handoff: { type: boolean }
+        actions: { type: array, items: { type: string } }
+        trace_id: { type: string }
+    MutationReceipt:
+      type: object
+      required: [id, status, trace_id]
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [draft, approved, rejected, queued, sent, failed] }
+        trace_id: { type: string }
+    Reminder:
+      type: object
+      required: [id, subject_ref, status, due_at]
+      properties:
+        id: { type: string, format: uuid }
+        subject_ref: { type: string }
+        status: { type: string, enum: [draft, pending_approval, approved, queued, sent, failed, expired] }
+        due_at: { type: string, format: date-time }
+        draft_text: { type: string }
+        last_delivery_error: { type: string }
+    FraudCaseReference:
+      type: object
+      required: [case_id, publisher, published_at, title, url]
+      properties:
+        case_id: { type: string }
+        publisher: { type: string }
+        published_at: { type: string, format: date }
+        title: { type: string }
+        url: { type: string, format: uri }

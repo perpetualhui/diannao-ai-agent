@@ -1,0 +1,23 @@
+{
+  "__说明": "微信 sender → 店脑账号 绑定表。复制为 users.json 后按实际填写。sender_id 是微信侧的发送者标识（OpenClaw 的 requesterSenderId）。演示环境用 demo 密码；正式环境应改为一次性绑定码换取短期 token。",
+  "users": [
+    {
+      "sender_id": "wxid-staff-luo",
+      "login_name": "staff-a",
+      "password": "demo-password",
+      "label": "罗店员（贝贝母婴 A 店 · staff）"
+    },
+    {
+      "sender_id": "wxid-owner-zhou",
+      "login_name": "diannaoxy",
+      "password": "demo-password",
+      "label": "周店长（贝贝母婴 A 店 · owner）"
+    },
+    {
+      "sender_id": "wxid-staff-b",
+      "login_name": "staff-b",
+      "password": "demo-password",
+      "label": "邻家母婴 B 店店员（隔离测试）"
+    }
+  ]
+}

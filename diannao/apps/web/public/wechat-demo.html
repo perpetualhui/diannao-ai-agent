@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>店脑 · 微信对话演示</title>
+<style>
+  :root{
+    --wx-green:#07c160; --wx-bg:#ededed; --wx-bubble:#95ec69;
+    --ink:#1f2d2b; --muted:#7a8a86; --line:#e3e9e5;
+    --brand:#2c6660; --brand-dark:#1d383d; --paper:#fbfcf9; --page:#eaf0ea;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;padding:32px 20px;
+    font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+    color:var(--ink);
+    background:radial-gradient(1200px 600px at 15% -10%,#dcebe1 0%,transparent 60%),
+               radial-gradient(900px 500px at 90% 110%,#e7e2d5 0%,transparent 55%),
+               var(--page);
+    display:flex;gap:40px;align-items:flex-start;justify-content:center;flex-wrap:wrap;
+  }
+  /* ── 手机模拟器 ── */
+  .phone{
+    width:390px;max-width:100%;height:780px;background:#fff;border-radius:42px;
+    box-shadow:0 40px 90px rgba(22,52,44,.28),0 0 0 10px #1c2b2a,0 0 0 12px #3b4a48;
+    display:flex;flex-direction:column;overflow:hidden;position:relative;
+  }
+  .notch{
+    position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:140px;height:26px;background:#1c2b2a;border-radius:0 0 18px 18px;z-index:5;
+  }
+  .wx-status{
+    height:44px;display:flex;align-items:center;justify-content:space-between;
+    padding:14px 22px 0;font-size:13px;font-weight:600;color:#0e1a18;flex:none;
+  }
+  .wx-battery{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#0e1a18}.wx-battery i{position:relative;display:inline-block;width:24px;height:12px;border:1.5px solid #0e1a18;border-radius:3px;background:#fff}.wx-battery i:before{content:"";position:absolute;left:1.5px;top:1.5px;bottom:1.5px;width:66%;background:#2fa96b;border-radius:1px}.wx-battery i:after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:6px;background:#0e1a18;border-radius:0 1px 1px 0}.wx-header{
+    flex:none;display:flex;align-items:center;gap:10px;padding:8px 14px 10px;
+    background:#f6f6f6;border-bottom:1px solid #dadada;
+  }
+  .wx-back{font-size:26px;line-height:1;color:#333;padding:0 4px;cursor:default}
+  .wx-title{flex:1;text-align:center}
+  .wx-title b{display:block;font-size:17px;font-weight:600}
+  .wx-title small{font-size:11px;color:#8a8a8a}
+  .wx-dots{font-size:20px;color:#333;letter-spacing:1px;padding:0 6px}
+  .scene-tabs{
+    flex:none;display:flex;gap:6px;padding:10px 12px;background:#f2f5f1;
+    border-bottom:1px solid var(--line);overflow-x:auto;
+  }
+  .scene-tabs button{
+    flex:none;border:1px solid #d5e0d8;background:#fff;color:#526661;
+    font-size:12px;font-weight:700;padding:7px 12px;border-radius:99px;cursor:pointer;
+    transition:.18s;
+  }
+  .scene-tabs button.active{background:var(--brand);border-color:var(--brand);color:#fff}
+  .wx-shot-wrap{flex:1;overflow-y:auto;background:#ededed;padding:0}.wx-shot-wrap img{width:100%;display:block}.chat{
+    flex:1;overflow-y:auto;padding:16px 14px 8px;background:var(--wx-bg);
+    display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;
+  }
+  .msg{display:flex;gap:8px;max-width:88%}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}
+  .avatar{
+    width:34px;height:34px;border-radius:8px;flex:none;display:grid;place-items:center;
+    font-size:13px;font-weight:800;color:#fff;background:var(--brand-dark);
+  }
+  .msg.user .avatar{background:#5b8def}
+  .bubble{
+    padding:10px 13px;border-radius:10px;background:#fff;font-size:14px;line-height:1.65;
+    white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 2px rgba(0,0,0,.06);position:relative;
+  }
+  .msg.user .bubble{background:var(--wx-bubble)}
+  .bubble .tag{
+    display:inline-block;margin-top:6px;font-size:10px;color:#8a9a96;
+    background:#f1f5f2;border-radius:4px;padding:2px 6px;
+  }
+  .bubble .warn{color:#b4552c;font-weight:700}
+  .typing{display:flex;gap:4px;padding:12px 14px;background:#fff;border-radius:10px;width:52px}
+  .typing i{width:6px;height:6px;border-radius:50%;background:#b9c6c2;animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}
+  .typing i:nth-child(3){animation-delay:.4s}
+  @keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+  .msg{animation:msgIn .3s cubic-bezier(.2,.7,.3,1)}
+  @keyframes blink{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
+  .composer{
+    flex:none;display:flex;gap:8px;padding:10px 12px 14px;background:#f6f6f6;
+    border-top:1px solid #dadada;align-items:center;
+  }
+  .composer input{
+    flex:1;border:1px solid #d9dfda;border-radius:8px;padding:10px 12px;font-size:14px;
+    outline:none;background:#fff;
+  }
+  .composer input:focus{border-color:var(--brand)}
+  .composer button{
+    border:0;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;
+    background:var(--brand);color:#fff;transition:.18s;white-space:nowrap;
+  }
+  .composer button:hover{background:#3c756e}.composer button:active{transform:scale(.97)}
+  .composer button.ghost{background:#e7efe9;color:#2c6660}
+  .composer button:disabled{opacity:.5;cursor:not-allowed}
+  /* ── 右侧说明 ── */
+  .side{width:520px;max-width:100%;display:flex;flex-direction:column;gap:18px}
+  .brand-line{display:flex;align-items:baseline;gap:10px}
+  .brand-line .logo{font-size:30px;font-weight:900;letter-spacing:-.06em;color:#193c42}
+  .brand-line .logo span{color:#d18354}
+  .brand-line .ver{font-size:12px;color:#7d8f8a}
+  .lede{font-size:15px;line-height:1.85;color:#4c625d;margin:0}
+  .card{
+    background:var(--paper);border:1px solid #dfe8e1;border-radius:16px;padding:22px 24px;
+    box-shadow:0 10px 30px rgba(30,70,55,.06);
+  }
+  .card h2{font-size:16px;margin:0 0 12px;letter-spacing:-.01em}
+  .card h2 small{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px}
+  .case-list{display:grid;gap:10px}
+  .case{
+    display:flex;gap:12px;padding:12px;border-radius:10px;background:#f4f8f4;border:1px solid #e3ece5;
+    cursor:pointer;transition:.18s;
+  }
+  .case:hover,.case.active{background:#eaf4ec;border-color:#bcd5c4}
+  .case .ico{font-size:20px;line-height:1.2}
+  .case b{display:block;font-size:13px;margin-bottom:3px}
+  .case p{margin:0;font-size:12px;line-height:1.6;color:#5d736d}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  .steps li{position:relative;padding-left:32px;font-size:12.5px;line-height:1.7;color:#4f6762}
+  .steps li:before{
+    counter-increment:s;content:counter(s);position:absolute;left:0;top:0;
+    width:21px;height:21px;border-radius:50%;background:var(--brand);color:#fff;
+    font-size:11px;font-weight:800;display:grid;place-items:center;
+  }
+  .steps code{background:#edf3ee;padding:1px 5px;border-radius:4px;font-size:11.5px}
+  .status-line{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#6b7f79}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#c3cfc9;margin-right:5px;vertical-align:middle}
+  .dot.on{background:#2fa96b;box-shadow:0 0 0 3px #2fa96b22}
+  .dot.off{background:#d08a4b}
+  .note{font-size:11.5px;color:#8a9a95;line-height:1.7;margin:10px 0 0}
+  @media(max-width:980px){body{padding:20px 12px;gap:24px}.phone{height:700px}}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="wx-status"><span>9:41</span><span class="wx-battery"><b>66%</b><i></i></span></div>
+  <div class="wx-header">
+    <div class="wx-back">‹</div>
+    <div class="wx-title"><b>店脑 ClawBot</b><small id="connState">连接中…</small></div>
+    <div class="wx-dots">···</div>
+  </div>
+  <div class="scene-tabs" id="tabs">
+    <button data-scene="baby" class="active">母婴店</button>
+    <button data-scene="apparel">服装店</button>
+    <button data-scene="fraud">AI 反诈</button>
+  </div>
+  <div class="chat" id="chat"></div>
+  <div class="composer">
+    <button class="ghost" id="playBtn">▶ 演示</button>
+    <input id="input" placeholder="像微信聊天一样输入…" autocomplete="off">
+    <button id="sendBtn">发送</button>
+  </div>
+</div>
+
+<div class="side">
+  <div class="brand-line">
+    <div class="logo">店脑<span>·</span></div>
+    <div class="ver">门店经验与老客服务系统 · 微信对话演示</div>
+  </div>
+  <p class="lede">
+    老店姐回老家了，三百多个老客的喜好还在店里。<br>
+    店员不用打开任何后台，<b>在微信对话框里问一句</b>，店脑就能把上次买过什么、孩子多大、有什么过敏，连同依据一起找出来。
+  </p>
+
+  <div class="card">
+    <h2>四个真实场景 <small>点一下切换演示</small></h2>
+    <div class="case-list" id="caseList">
+      <div class="case active" data-scene="baby">
+        <div class="ico">🍼</div>
+        <div><b>台江母婴店 · 老客交接</b>
+        <p>店姐离职，新店员靠尾号找到张姐，知道她上次买的深度水解配方，还知道宝宝牛奶蛋白过敏。</p></div>
+      </div>
+      <div class="case" data-scene="apparel">
+        <div class="ico">👕</div>
+        <div><b>服装店 · 尺码与偏好</b>
+        <p>会员号一查，上装下装尺码、版型与颜色偏好都在，推荐不靠猜。</p></div>
+      </div>
+      <div class="case" data-scene="fraud">
+        <div class="ico">🛡️</div>
+        <div><b>AI 反诈 · 公共咨询</b>
+        <p>客人问「刷单返利是真的吗」，只给风险提示与核实步骤，不读任何门店客户资料。</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>怎么真正接到微信 <small>本机四步</small></h2>
+    <ol class="steps">
+      <li>本机安装 OpenClaw：<code>openclaw --version</code>，再装腾讯微信插件 <code>@tencent-weixin/openclaw-weixin</code></li>
+      <li>扫码登录：<code>openclaw channels login --channel openclaw-weixin</code>（二维码只能你自己扫）</li>
+      <li>把渠道消息指向本地网关：<code>POST http://localhost:7402/wechat/webhook</code></li>
+      <li>配置员工微信 sender 白名单：<code>DIANNAO_ALLOWED_SENDER_IDS</code>，未绑定的人查不到任何数据</li>
+    </ol>
+    <p class="note">当前页面：母婴场景调用真实店脑 API；汽修/服装为演示脚本（标注「演示」）；反诈为规则提示。未接真实模型，未接真实微信。</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const chat = $('chat'), input = $('input'), sendBtn = $('sendBtn'), playBtn = $('playBtn');
+  const connState = $('connState');
+
+  // ── 会话：真实 API 登录态（内存 + sessionStorage） ──
+  let token = sessionStorage.getItem('diannao_token') || '';
+  let tokenScene = ''; // 当前 token 属于哪个场景
+  let apiOnline = false;
+
+  async function api(path, init = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(init.headers || {}) };
+    if (token) headers.Authorization = 'Bearer ' + token;
+    const res = await fetch(path, { ...init, headers, signal: AbortSignal.timeout(8000) });
+    if (res.status === 401 && token) { token = ''; sessionStorage.removeItem('diannao_token'); }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+  // 演示 token 由服务端签发（DEMO_MODE=0 可关闭），前端不保存任何密码
+  async function ensureLogin(forScene = scene) {
+    if (!['baby', 'apparel'].includes(forScene)) return false;
+    if (token && tokenScene === forScene) return true;
+    try {
+      const r = await api('/v1/demo/token', {
+        method: 'POST',
+        body: JSON.stringify({ scene: forScene }),
+      });
+      token = r.principal.token;
+      tokenScene = forScene;
+      sessionStorage.setItem('diannao_token', token);
+      return true;
+    } catch { return false; }
+  }
+
+
+  // ── 默认展示：店脑功能对话（真实能力，非默认人格） ──
+  function renderIntroChat() {
+    clearChat();
+    addMsg('user', '你有什么功能');
+    addMsg('bot', [
+      '我是店脑，帮门店记住老客与经验的助手。',
+      '',
+      '我能做这些：',
+      '· 查老客：上次买了什么、孩子多大、有没有过敏，带依据回答',
+      '· 记服务：一句话记录这次接待，店长审核后入档',
+      '· 查反诈：风险信号 + 官方来源 + 96110 核实步骤',
+      '· 多店隔离：每家店独立数据，越权查不到',
+      '· 微信里直接用：绑定后在对话里操作，不用另开 App',
+      '',
+      '查客户资料需要先绑定门店身份。要试试哪个？',
+    ].join('\n'), '真实能力');
+  }
+
+  // ── 场景脚本 ──
+  const SCENES = {
+    baby: {
+      name: '母婴店',
+      intro: '台江母婴店 · 新店员小林刚接班。老店姐上月底回老家了。',
+      script: [
+        { role: 'user', text: '查一下尾号1234的张姐上次买的什么' },
+        { role: 'bot', dynamic: 'baby_card' },
+        { role: 'user', text: '她说和上次一样，再拿一箱' },
+        { role: 'bot', text: '已经锚定上次的具体商品：诺贝特殊配方奶粉 2段（深度水解）800g ×2，购于 2026-10-20。\n\n请确认后再提交，不会把「和上次一样」当成自动下单。', tag: '依据：订单 txn-001' },
+        { role: 'user', text: '记一下：确认要一箱，明天来拿' },
+        { role: 'bot', text: '已保存为服务记录草稿（draft），等待店长审核后生效。\n没有直接改写客户档案。', tag: '草稿不入正式档案' },
+      ],
+    },
+    apparel: {
+      name: '服装店',
+      intro: '服装店 · 会员到店，店员在微信里查尺码与偏好。',
+      script: [
+        { role: 'user', text: '查一下尾号2468的陈女士穿什么尺码' },
+        { role: 'bot', dynamic: 'apparel_card' },
+        { role: 'user', text: '推荐一套春天穿的' },
+        { role: 'bot', text: '建议：米白针织开衫（M）+ 直筒牛仔裤（L），符合她的宽松版型与低饱和配色偏好。\n\n库存需现场确认，不承诺现货。', tag: '搭配建议 · 库存需确认' },
+      ],
+    },
+    fraud: {
+      name: 'AI 反诈',
+      intro: '公共反诈咨询 · 只读审核过的公开信息，不接触任何门店客户资料。',
+      script: [
+        { role: 'user', text: '有个客人说刷单做任务能返利，先垫付500，是真的吗？' },
+        { role: 'bot', text: '⚠ 风险提示：刷单返利是常见诈骗手法。\n\n· 要求垫资、做任务解锁返利\n· 先小额返现建立信任，再以「操作失败/账户冻结」持续索款\n\n请勿转账、勿提供验证码。核实请拨 96110。', tag: '公共反诈 · 不读取门店数据' },
+        { role: 'user', text: '她已经转了怎么办？' },
+        { role: 'bot', text: '1. 立即停止继续转账\n2. 保留聊天记录与转账凭证\n3. 联系银行申请止付/冻结\n4. 拨打 110 或 96110 报案\n\n未命中具体案例不代表安全。', tag: '公共反诈 · 不认定犯罪' },
+      ],
+    },
+  };
+
+  let scene = 'baby';
+  let busy = false;
+
+  // ── 渲染 ──
+  function addMsg(role, text, tag) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ' + role;
+    const av = document.createElement('div');
+    av.className = 'avatar';
+    av.textContent = role === 'user' ? '林' : '脑';
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const t = document.createElement('span');
+    t.textContent = text;
+    b.appendChild(t);
+    if (tag) {
+      const s = document.createElement('span');
+      s.className = 'tag';
+      s.textContent = tag;
+      b.appendChild(document.createElement('br'));
+      b.appendChild(s);
+    }
+    wrap.appendChild(av); wrap.appendChild(b);
+    chat.appendChild(wrap);
+    chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
+    return wrap;
+  }
+  function addTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = '<div class="avatar">脑</div><div class="typing"><i></i><i></i><i></i></div>';
+    chat.appendChild(wrap); chat.scrollTop = chat.scrollHeight;
+    return wrap;
+  }
+  function clearChat() { chat.innerHTML = ''; }
+
+  // ── 真实 API：按场景查客户卡片 ──
+  async function cardFor(query, forScene = scene) {
+    const ok = await ensureLogin(forScene);
+    if (!ok) throw new Error('API 未连接');
+    const resolved = await api('/v1/identity/resolve', {
+      method: 'POST', body: JSON.stringify({ query }),
+    });
+    if (resolved.match_status === 'ambiguous') {
+      return { text: '找到 ' + resolved.candidates.length + ' 位候选：\n' + resolved.candidates.map((c, i) => (i + 1) + '. ' + c.masked_label).join('\n') + '\n\n请补充会员号或姓名确认。', tag: '未确认前不展示档案' };
+    }
+    if (resolved.match_status !== 'matched') return { text: '未找到匹配客户。', tag: '真实 API' };
+    const s = await api('/v1/subjects/' + encodeURIComponent(resolved.resolved_subject_ref));
+    const lines = [];
+    lines.push('【是谁】' + s.display_label);
+    if (s.recent_transactions.length) {
+      const info = s.recent_transactions.slice(0, 3).map(t =>
+        t.lines.map(l => l.product_name + '×' + l.quantity).join('、') + '（' + t.occurred_at.slice(0, 10) + '）'
+      );
+      lines.push('【以前买过】' + info.join('；'));
+    } else lines.push('【以前买过】暂无购买记录');
+    if (s.suggestions.length) lines.push('【建议】' + s.suggestions.join('；'));
+    if (s.handoff_required) lines.push('⚠ 涉及需人工确认事项，请转店长。');
+    const ev = s.recent_transactions[0];
+    if (ev) lines.push('依据：订单 ' + String(ev.id).slice(0, 8) + ' · ' + ev.occurred_at.slice(0, 10));
+    return { text: lines.join('\n'), tag: '真实店脑 API' };
+  }
+
+  // ── 反诈结果格式化 ──
+  function formatFraud(b) {
+    const lines = [];
+    const level = { high: '高风险', medium: '中风险', low: '低风险', unknown: '待判断' }[b.risk_level] || '待判断';
+    lines.push('⚠ 风险等级：' + level);
+    if (b.matched_signals && b.matched_signals.length) lines.push('命中信号：' + b.matched_signals.join('、'));
+    if (b.cases && b.cases.length) {
+      lines.push('参考官方案例：');
+      b.cases.forEach(c => lines.push('· ' + c.publisher + '《' + c.title + '》（' + c.published_at + '）'));
+    }
+    if (b.suggested_steps && b.suggested_steps.length) {
+      lines.push('建议步骤：');
+      b.suggested_steps.forEach((s, i) => lines.push((i + 1) + '. ' + s));
+    }
+    lines.push('注：未命中具体案例不代表安全；本服务不读取门店客户资料，也不对任何人作犯罪定性。');
+    return lines.join('\n');
+  }
+
+  // ── 发送一条 ──
+  async function send(text, fromScript = false) {
+    if (busy || !text.trim()) return;
+    busy = true; sendBtn.disabled = true; playBtn.disabled = true;
+    addMsg('user', text.trim());
+    const typing = addTyping();
+    try {
+      let reply;
+      if (scene === 'baby') {
+        try {
+          reply = await cardFor('1234');
+          apiOnline = true; updateDots();
+        } catch (e) {
+          reply = { text: '（API 未连接，以下为演示数据）\n\n张女士（尾号 1234）\n【是谁】张女士，会员 M10012，孩子小宝 15 月龄\n【以前买过】诺贝特殊配方奶粉 2段（深度水解）×2（2026-10-20）\n【建议】宝宝有牛奶蛋白过敏记录，配方选择先转店长确认。', tag: '演示数据' };
+          apiOnline = false; updateDots();
+        }
+      } else if (scene === 'apparel') {
+        try {
+          reply = await cardFor('2468', 'apparel');
+          apiOnline = true; updateDots();
+        } catch (e) {
+          reply = { text: '（API 未连接，以下为演示数据）\n\n陈女士（会员 C2001 · 尾号 2468）\n【是谁】陈女士\n【常穿尺码】上装 M / 下装 L\n【偏好】莫兰迪色、宽松版型\n【建议】可按上次风格搭配同色系新品。', tag: '演示数据' };
+          apiOnline = false; updateDots();
+        }
+      } else if (scene === 'fraud') {
+        try {
+          const r = await fetch('/v1/antifraud/assess', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description: text }),
+            signal: AbortSignal.timeout(8000),
+          });
+          const b = await r.json();
+          reply = { text: formatFraud(b), tag: '公共反诈 · 官方来源' };
+        } catch {
+          const hit = SCENES.fraud.script.filter(x => x.role === 'bot');
+          reply = { text: hit[Math.min(1, hit.length - 1)].text, tag: '演示数据' };
+        }
+      }
+      await wait(500 + Math.random() * 400);
+      typing.remove();
+      addMsg('bot', reply.text, reply.tag);
+    } catch (e) {
+      typing.remove();
+      addMsg('bot', '服务暂时不可用：' + (e.message || e) + '\n请通过网页后台核实。', '错误');
+    } finally {
+      busy = false; sendBtn.disabled = false; playBtn.disabled = false;
+    }
+  }
+
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // ── 播放演示 ──
+  async function play() {
+    if (busy) return;
+    const s = SCENES[scene];
+    clearChat();
+    for (const step of s.script) {
+      if (step.role === 'user') {
+        addMsg('user', step.text);
+        await wait(520);
+      } else {
+        const typing = addTyping();
+        await wait(680);
+        typing.remove();
+        if (step.dynamic === 'baby_card') {
+          try { const r = await cardFor('1234', 'baby'); apiOnline = true; addMsg('bot', r.text, r.tag); }
+          catch { addMsg('bot', '张女士（尾号 1234）\n【是谁】张女士，会员 M10012，孩子小宝 15 月龄\n【以前买过】诺贝特殊配方奶粉 2段（深度水解）×2（2026-10-20）\n【建议】宝宝有牛奶蛋白过敏记录，配方选择先转店长确认。', '演示数据'); apiOnline = false; }
+          updateDots();
+        } else if (step.dynamic === 'apparel_card') {
+          try { const r = await cardFor('2468', 'apparel'); apiOnline = true; addMsg('bot', r.text, r.tag); }
+          catch { addMsg('bot', '陈女士（会员 C2001 · 尾号 2468）\n【是谁】陈女士\n【常穿尺码】上装 M / 下装 L\n【偏好】莫兰迪色、宽松版型\n【建议】可按上次风格搭配同色系新品。', '演示数据'); apiOnline = false; }
+          updateDots();
+        } else {
+          addMsg('bot', step.text, step.tag);
+        }
+        await wait(500);
+      }
+    }
+  }
+
+  // ── 场景切换 ──
+  function setScene(next) {
+    scene = next;
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.scene === next));
+    document.querySelectorAll('.case').forEach(b => b.classList.toggle('active', b.dataset.scene === next));
+    renderIntroChat();
+    input.placeholder = next === 'baby' ? '试试：查一下尾号1234' : '像微信聊天一样输入…';
+  }
+
+  document.getElementById('tabs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (b) setScene(b.dataset.scene);
+  });
+  document.getElementById('caseList').addEventListener('click', e => {
+    const c = e.target.closest('.case'); if (c) { setScene(c.dataset.scene); play(); }
+  });
+  sendBtn.addEventListener('click', () => { const v = input.value; input.value = ''; send(v); });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { const v = input.value; input.value = ''; send(v); } });
+  playBtn.addEventListener('click', play);
+
+  // ── 连接状态 ──
+  async function ping(url) {
+    try { const r = await fetch(url, { signal: AbortSignal.timeout(3000) }); return r.ok; } catch { return false; }
+  }
+  async function updateDots() {
+    if (!document.getElementById('dotApi')) return; // 状态卡片已移除时跳过
+    const [api, web, gw] = await Promise.all([ping('/v1/health'), ping('/'), ping('/wechat/health')]);
+    $('dotApi').className = 'dot ' + (api ? 'on' : 'off');
+    $('dotWeb').className = 'dot ' + (web ? 'on' : 'off');
+    $('dotGw').className = 'dot ' + (gw ? 'on' : 'off');
+    connState.textContent = api ? '● 店脑 API 已连接' : '○ API 未连接（演示模式）';
+  }
+
+  // 启动
+  // 支持 ?scene=baby|apparel|fraud 直达
+  const initialScene = new URLSearchParams(location.search).get('scene');
+  setScene(SCENES[initialScene] ? initialScene : 'baby');
+  renderIntroChat();
+  updateDots();
+  setInterval(updateDots, 15000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# 文件包说明
+
+- 发送人：E（吴）
+- 接收人：A（周）／全体复核
+- 日期：2026-11-07
+- 基于版本：起始包 v0（首次迁入）
+- 本次变更：
+  - 按 `01-共用开发规范.md` 第二节建出 `diannao/` 共用目录骨架（根级 CLAUDE.md/AGENTS.md/ROADMAP.md/README.md/.env.example/.gitignore + 各目录主责 README 占位）
+  - 将起始包 `plugin/` 原型迁入 `adapters/wechat/`（index.ts/openclaw.plugin.json/package.json/SKILL.md/README.md），安全模型未改
+  - 完成 `tests/e2e/` Mock/real 双模式客户端和 7 条用例：5 条接待链路与 2 条微信安全边界
+  - 产出 `adapters/wechat/CH-01-插件能力矩阵.md`（当前标阻塞）
+- 覆盖路径：`diannao/`（仅 E 主责：`adapters/wechat/`、`tests/e2e/`；其余目录为占位，各主责人后续覆盖）
+- 验证状态：
+  - 目录结构与 `01` 第二节一致 ✅
+  - `adapters/wechat/index.ts` 类型与逻辑迁入自原 `plugin/index.ts`，未改安全模型 ✅
+  - `tests/e2e`: `npm run typecheck` 通过 ✅
+  - `tests/e2e`: `npm test` 7/7 通过，0 跳过 ✅
+  - npm audit：0 vulnerabilities ✅
+  - Node.js v24.15.0、npm 11.12.1 已记录；OpenClaw 命令不存在 ✅
+  - 真实 OpenClaw 联调：**未做**，CH-01 标阻塞
+  - 真实 API 模式已实现；设置环境变量后可直接调用 `/v1/identity/resolve` 与 `/v1/assistant/ask`
+- 已知问题：
+  - 腾讯插件 pairing 局限未实测
+  - C 的网页与 B 的真实 API 尚未交付，当前没有页面级联调证据
+- 接收方需要做：
+  - A 核对目录主权与状态真实性
+  - B 核对正式响应字段与 OpenAPI；真实服务到位后由拼装环境切 `E2E_API_MODE=real`
+  - C 核对 web 本地端口与 `E2E_WEB_BASE_URL` 是否一致
+- 不得覆盖：`packages/contracts/`、`services/api/`、`services/ai/`、`apps/web/`、`db/migrations/`、`configs/scenarios/`、`docs/`

@@ -1,0 +1,95 @@
+{
+  "schema_version": "2.0",
+  "common": {
+    "capture_flow": ["resolve_subject", "capture", "confirm"],
+    "default_output_level": "L2",
+    "evidence_required_for": ["customer_fact", "price", "inventory", "recommendation"],
+    "subject_identity": "uuid",
+    "wechat_channel": "openclaw-weixin",
+    "disable_unverified_public_data_access": true,
+    "reminder_send_policy": "staff_approval_and_channel_capability_check"
+  },
+  "scenes": [
+    {
+      "scene_id": "baby",
+      "label": "母婴",
+      "subject_types": ["person", "child", "family"],
+      "field_schema": {
+        "child.birthdate": {"type": "date", "derived": ["age_months"], "data_class": "objective"},
+        "child.allergy": {"type": "array", "data_class": "safety", "manual_verification": true},
+        "child.formula_stage": {"type": "string", "data_class": "objective"},
+        "child.diapers_size": {"type": "string", "data_class": "preference"},
+        "pref.brand": {"type": "string", "data_class": "preference"}
+      },
+      "triggers": ["birthdate_milestone", "replenishment_estimate", "promotion_review", "inventory_arrival"],
+      "rules": ["hard_age_range_filter", "allergy_manual_check", "stock_freshness_check"],
+      "human_handoff": ["medical_advice", "child_health", "complaint", "safety_conflict"],
+      "sample_query": "手机号尾号1234的张女士上次买了什么纸尿裤？"
+    },
+    {
+      "scene_id": "apparel",
+      "label": "服装",
+      "subject_types": ["person"],
+      "field_schema": {
+        "size.top": {"type": "string", "data_class": "objective"},
+        "size.bottom": {"type": "string", "data_class": "objective"},
+        "pref.color": {"type": "array", "data_class": "preference"},
+        "pref.fit": {"type": "array", "data_class": "preference"}
+      },
+      "triggers": ["season_change", "birthday", "same_sku_restored"],
+      "rules": ["size_confirm_if_stale", "in_stock_only"],
+      "human_handoff": ["size_uncertain", "refund_dispute", "private_body_comment"],
+      "sample_query": "张女士喜欢什么风格？上次买多大码？"
+    },
+    {
+      "scene_id": "auto",
+      "label": "汽修",
+      "subject_types": ["person", "vehicle"],
+      "field_schema": {
+        "vehicle.plate": {"type": "string", "data_class": "objective"},
+        "vehicle.vin": {"type": "string", "data_class": "objective"},
+        "vehicle.odometer_km": {"type": "integer", "data_class": "objective"},
+        "vehicle.last_service_at": {"type": "date", "data_class": "objective"}
+      },
+      "triggers": ["mileage_threshold", "service_date", "insurance_due"],
+      "rules": ["estimate_requires_work_order", "conflicting_mileage_review"],
+      "human_handoff": ["diagnose_fault", "repair_warranty", "accident_liability"],
+      "sample_query": "这辆车上次换过什么零件？"
+    },
+    {
+      "scene_id": "medical_aesthetics",
+      "label": "医美（未来）",
+      "subject_types": ["person"],
+      "field_schema": {
+        "service.last_project": {"type": "string", "data_class": "objective"},
+        "service.feedback": {"type": "string", "data_class": "preference"}
+      },
+      "triggers": ["service_followup_approval"],
+      "rules": ["sensitive_data_restricted"],
+      "human_handoff": ["medical_diagnosis", "treatment_advice", "effect_claim"],
+      "sample_query": "这位客户上次服务后的反馈是什么？"
+    },
+    {
+      "scene_id": "pharmacy",
+      "label": "药店/关怀（未来）",
+      "subject_types": ["person", "family"],
+      "field_schema": {
+        "medication.last_dispense_at": {"type": "date", "data_class": "safety"},
+        "family.contact_authorized": {"type": "boolean", "data_class": "relationship"}
+      },
+      "triggers": ["staff_followup", "authorization_expiry"],
+      "rules": ["health_safety_block", "family_contact_requires_explicit_authorization"],
+      "human_handoff": ["medication_dose", "health_risk", "suspected_scam"],
+      "sample_query": "有没有授权且需要人工复诊提醒的记录？"
+    }
+  ],
+  "antifraud_service": {
+    "independent_domain": true,
+    "public_cases_only": true,
+    "case_types_initial": ["刷单返利", "色情引流/招嫖诈骗/裸聊敲诈"],
+    "source_requirements": ["publisher", "title", "published_at", "official_url", "review_status"],
+    "output": ["risk_signals", "matched_official_case", "uncertain_facts", "verification_steps"],
+    "no_access_to": ["tenants", "subjects", "transactions", "attributes"],
+    "human_handoff": ["money_already_transferred", "minor_or_elder_involved", "imminent_loss", "criminal_assertion"]
+  }
+}

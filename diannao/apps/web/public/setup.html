@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>店脑 · 配置我的店</title>
+<style>
+  :root{--brand:#2c6660;--ink:#1f2d2b;--muted:#7a8a86;--paper:#fbfcf9;--line:#dfe8e1}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;color:var(--ink);
+    background:radial-gradient(1000px 520px at 10% -10%,#dcebe1 0%,transparent 60%),
+               radial-gradient(800px 460px at 94% 110%,#e9e4d7 0%,transparent 55%),#eaf0ea;
+    padding:48px 20px 64px;display:flex;justify-content:center}
+  .wrap{width:100%;max-width:880px}
+  .brand{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+  .brand h1{font-size:30px;margin:0;letter-spacing:-.06em;font-weight:900;color:#193c42}
+  .brand h1 span{color:#d18354}
+  .brand small{font-size:12px;color:var(--muted)}
+  .lede{font-size:14px;color:#4c625d;line-height:1.8;margin:0 0 26px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px;
+    box-shadow:0 14px 36px rgba(30,70,55,.07)}
+  .card h2{font-size:16px;margin:0 0 16px}
+  label{display:block;font-size:12px;font-weight:700;margin:14px 0 6px;color:#4b615c}
+  input,select{width:100%;padding:11px 12px;border:1px solid #d9e2db;border-radius:9px;font-size:14px;background:#fff;outline:none}
+  input:focus,select:focus{border-color:var(--brand)}
+  button{margin-top:18px;width:100%;border:0;border-radius:10px;padding:13px;font-size:14px;font-weight:800;
+    background:var(--brand);color:#fff;cursor:pointer;transition:.18s}
+  button:hover{background:#3c756e}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .qr-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;gap:14px}
+  .qr-box img{width:240px;height:240px;border-radius:12px;border:1px solid #e2eae4;background:#fff}
+  .code{font-size:30px;font-weight:900;letter-spacing:.28em;color:var(--brand);font-variant-numeric:tabular-nums}
+  .hint{font-size:12px;color:#71837d;line-height:1.8;text-align:center;max-width:300px}
+  .steps{margin:18px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:12px}
+  .steps li{position:relative;padding-left:30px;font-size:13px;line-height:1.75;color:#4f6762}
+  .steps li:before{counter-increment:s;content:counter(s);position:absolute;left:0;top:1px;width:20px;height:20px;
+    border-radius:50%;background:var(--brand);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+  .steps code{background:#edf3ee;padding:1px 5px;border-radius:4px}
+  .status{margin-top:14px;font-size:12px;padding:10px 12px;border-radius:8px;background:#eef5ef;color:#48655b;display:none}
+  .status.err{background:#fbecea;color:#9c4a3c}
+  .foot{margin-top:22px;font-size:12px;color:#8a9a95;line-height:1.8}
+  .foot a{color:var(--brand);text-decoration:none;font-weight:700}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><h1>店脑<span>·</span></h1><small>配置我的店</small></div>
+  <p class="lede">选择门店场景，生成一个绑定二维码。让店员用微信扫一下、把数字发给「店脑 ClawBot」，就完成绑定——之后这个微信就能查本店数据。</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>① 生成绑定码</h2>
+      <label for="scene">门店场景</label>
+      <select id="scene">
+        <option value="baby">母婴店 · 经验传承</option>
+        <option value="apparel">服装店 · 客户画像</option>
+      </select>
+
+      <label for="label">绑定给谁</label>
+      <input id="label" placeholder="例如：罗店员 / 店长周" value="罗店员">
+
+      <label for="username">管理员账号</label>
+      <input id="username" value="diannaoxy" autocomplete="username">
+
+      <label for="password">管理员密码</label>
+      <input id="password" type="password" placeholder="请输入店长密码" autocomplete="current-password">
+
+      <button id="genBtn">生成绑定二维码</button>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>② 扫码绑定</h2>
+      <div class="qr-box" id="qrBox">
+        <div class="hint">二维码会显示在这里。<br>生成后请让店员用微信扫一扫。</div>
+      </div>
+      <ol class="steps">
+        <li>店员用微信扫左侧二维码，得到一个 <code>6 位数字</code></li>
+        <li>把数字发给微信里的「店脑 ClawBot」</li>
+        <li>收到「绑定成功」后，直接问「查一下尾号1234」即可</li>
+      </ol>
+    </div>
+  </div>
+
+  <p class="foot">
+    绑定码一次有效、10 分钟过期。一个微信只能绑定一个门店账号；换绑请重新生成。
+    <br>返回 <a href="/scenes.html">场景选择</a> · <a href="/">管理后台</a>
+  </p>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let token = '';
+
+async function api(path, body, auth) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (auth) headers.Authorization = 'Bearer ' + token;
+  const res = await fetch(path, { method: 'POST', headers, body: JSON.stringify(body), signal: AbortSignal.timeout(10000) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || ('HTTP ' + res.status));
+  return data;
+}
+
+function setStatus(text, isErr) {
+  const el = $('status');
+  el.textContent = text;
+  el.style.display = 'block';
+  el.className = 'status' + (isErr ? ' err' : '');
+}
+
+$('genBtn').addEventListener('click', async () => {
+  const btn = $('genBtn');
+  btn.disabled = true;
+  try {
+    // 1) 管理员登录
+    const login = await api('/v1/auth/login', {
+      login_name: $('username').value.trim(),
+      password: $('password').value,
+    });
+    token = login.principal.token;
+
+    // 2) 生成绑定码
+    const data = await api('/v1/setup/code', {
+      scene: $('scene').value,
+      label: $('label').value.trim() || '店员',
+    }, true);
+
+    // 3) 渲染二维码
+    $('qrBox').innerHTML = `
+      <img src="${data.qr_data_url}" alt="绑定二维码">
+      <div class="code">${data.code}</div>
+      <div class="hint">让店员用微信扫码，把数字发给「店脑 ClawBot」。<br>有效期 10 分钟，仅可使用一次。</div>`;
+    setStatus('绑定码已生成：' + data.code + '（10 分钟内有效）');
+  } catch (e) {
+    setStatus('生成失败：' + (e.message || e), true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

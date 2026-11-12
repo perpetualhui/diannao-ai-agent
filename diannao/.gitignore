@@ -1,0 +1,10 @@
+# 即使用不到 git 也保留，防止误传敏感/大体积文件
+node_modules/
+dist/
+.env
+*.log
+_snapshots/
+_incoming/
+_backup/
+_outbox/*.zip
+.DS_Store

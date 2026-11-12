@@ -1,0 +1,12 @@
+{
+  "name": "@dian-nao/contracts",
+  "version": "1.0.0",
+  "description": "店脑共享契约：TS 类型 + Mock（全场唯一真相，主责 B 邱）",
+  "type": "module",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "Apache-2.0"
+}

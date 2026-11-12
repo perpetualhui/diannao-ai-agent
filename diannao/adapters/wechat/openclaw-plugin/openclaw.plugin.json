@@ -1,0 +1,10 @@
+{
+  "id": "diannao-bridge",
+  "name": "DianNao Bridge",
+  "description": "把微信消息转发到店脑网关，返回门店客户、服务记录与绑定结果",
+  "categories": ["other"],
+  "contracts": { "tools": ["dian_nao"] },
+  "toolMetadata": { "dian_nao": { "optional": true } },
+  "activation": { "onStartup": true },
+  "configSchema": { "type": "object", "additionalProperties": false }
+}

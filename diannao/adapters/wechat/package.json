@@ -1,0 +1,12 @@
+{
+  "name": "dian-nao-openclaw-tool-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": { "typebox": "^1.4.3" },
+  "peerDependencies": { "openclaw": ">=2026.5.12" },
+  "openclaw": {
+    "extensions": ["./index.ts"],
+    "compat": { "minGatewayVersion": "2026.5.12", "pluginApi": ">=2026.5.12" }
+  }
+}
